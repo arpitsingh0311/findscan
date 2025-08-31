@@ -1,4 +1,4 @@
-<img width="1909" height="813" alt="image" src="https://github.com/user-attachments/assets/e4e51d1f-c625-4f57-9ab4-157b92140b4b" /># FindScan - Bollinger Bands Chart Indicator
+# FindScan - Bollinger Bands Chart Indicator
 This project is a production-ready Bollinger Bands indicator built for the FindScan Frontend Intern Assignment. The application is developed using Next.js, React, TypeScript, and TailwindCSS, with all charting functionality rendered exclusively via the KLineCharts library.
 
 The indicator is fully interactive, allowing real-time updates to its input parameters and style settings, closely replicating the user experience of professional charting platforms like TradingView.
