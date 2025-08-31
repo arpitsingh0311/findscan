@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<img width="1909" height="813" alt="image" src="https://github.com/user-attachments/assets/e4e51d1f-c625-4f57-9ab4-157b92140b4b" /># FindScan - Bollinger Bands Chart Indicator
+This project is a production-ready Bollinger Bands indicator built for the FindScan Frontend Intern Assignment. The application is developed using Next.js, React, TypeScript, and TailwindCSS, with all charting functionality rendered exclusively via the KLineCharts library.
 
-## Getting Started
+The indicator is fully interactive, allowing real-time updates to its input parameters and style settings, closely replicating the user experience of professional charting platforms like TradingView.
 
-First, run the development server:
+## Features
+- Dynamic Candlestick Chart: Renders over 200 data points of OHLCV data.
 
-```bash
+- Bollinger Bands Indicator: Overlays the BB indicator on the main chart.
+
+- Real-time Settings Panel: A two-tab modal for instant updates with no page refresh.
+
+Inputs Tab: Configure Length, StdDev (multiplier), and Offset.
+
+Style Tab: Control visibility, color, line width, and line style for the Basis, Upper, and Lower bands.
+
+- Customizable Background Fill: Toggle visibility and adjust the opacity of the area between the upper and lower bands.
+
+- Crosshair Tooltip: Displays the specific values for Basis, Upper, and Lower bands for the hovered candle.
+
+## Tech Stack
+- Framework: Next.js 14+
+
+- Library: React 18+
+
+- Language: TypeScript
+
+- Styling: TailwindCSS
+
+- Charting: KLineCharts
+
+## Setup and Run Instructions
+To run this project locally, follow these steps:
+
+### 1.)Clone the repository:
+
+git clone [https://github.com/your-username/findscan-bollinger-bands.git](https://github.com/your-username/findscan-bollinger-bands.git)
+cd findscan-bollinger-bands
+
+### 2.) Install dependencies:
+
+npm install
+
+### 3.) Run the development server:
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 4.) Open the application:
+Open http://localhost:3000 in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Technical Notes
+### Formulas and Standard Deviation
+The indicator's calculations adhere to the standard financial formulas for Bollinger Bands.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+For the volatility calculation, this project uses Sample Standard Deviation (with n-1 in the denominator), which is a common and appropriate choice for analyzing a sample of market data.
 
-## Learn More
+### KLineCharts Version
+klinecharts: 9.8.3 (Please verify this version from your package.json file)
 
-To learn more about Next.js, take a look at the following resources:
+## Screenshots
+Main chart view with the Bollinger Bands indicator applied.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+<img width="1909" height="813" alt="image" src="https://github.com/user-attachments/assets/aed52039-9c2b-4e2d-a20e-d63e949765cc" />
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Indicator settings panel allowing real-time customization of inputs and styles.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+<img width="612" height="461" alt="image" src="https://github.com/user-attachments/assets/91e1a400-2329-41b2-851d-3a1b0b673d94" />
