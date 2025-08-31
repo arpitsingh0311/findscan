@@ -1,6 +1,10 @@
 "use client";
 
-import { init, LineType, type KLineChart, type Indicator } from "klinecharts";
+// FINAL FIX: We import `init` and derive the KLineChart type from it.
+import { init, LineType, IndicatorSeries, type Indicator } from "klinecharts";
+// This is how we get the type for the chart instance
+type KLineChart = ReturnType<typeof init>;
+
 import { useEffect, useRef, useState } from "react";
 import {
   OHLCV,
@@ -47,15 +51,25 @@ const Chart = () => {
     if (containerRef.current && !chartRef.current) {
       const chart = init(containerRef.current, { styles: "dark" });
       chartRef.current = chart;
+      // Use optional chaining here
       chart?.createIndicator("VOL");
 
       fetch("/data/ohlcv.json")
         .then((res) => res.json())
         .then((data: OHLCV[]) => {
-          chart?.applyNewData(data);
+          // Map OHLCV[] to KLineData[]
+          const klineData = data.map((item) => ({
+            timestamp: item.timestamp,
+            open: item.open,
+            high: item.high,
+            low: item.low,
+            close: item.close,
+            volume: item.volume,
+          }));
+          chart?.applyNewData(klineData);
         });
 
-      // KEY FIX #1: The cleanup function must call `dispose()` to prevent duplicate charts.
+      // The cleanup function must call `dispose()` to prevent duplicate charts.
       return () => {
         chart;
       };
@@ -70,55 +84,86 @@ const Chart = () => {
     const data = chart.getDataList() as OHLCV[];
     const indicatorData = computeBollingerBands(data, bbInputs);
 
+    // Dynamically build the figures and styles arrays based on visibility.
+    const figures = [];
+    const lines = [];
+
+    if (bbStyles.upper.visible) {
+      figures.push({ key: "upper", title: "Upper: ", type: "line" });
+      lines.push({
+        color: bbStyles.upper.color,
+        size: bbStyles.upper.lineWidth,
+        style:
+          bbStyles.upper.lineStyle === "dashed"
+            ? LineType.Dashed
+            : LineType.Solid,
+      });
+    }
+    if (bbStyles.basis.visible) {
+      figures.push({ key: "basis", title: "Basis: ", type: "line" });
+      lines.push({
+        color: bbStyles.basis.color,
+        size: bbStyles.basis.lineWidth,
+        style:
+          bbStyles.basis.lineStyle === "dashed"
+            ? LineType.Dashed
+            : LineType.Solid,
+      });
+    }
+    if (bbStyles.lower.visible) {
+      figures.push({ key: "lower", title: "Lower: ", type: "line" });
+      lines.push({
+        color: bbStyles.lower.color,
+        size: bbStyles.lower.lineWidth,
+        style:
+          bbStyles.lower.lineStyle === "dashed"
+            ? LineType.Dashed
+            : LineType.Solid,
+      });
+    }
+
+    // CORRECTED LOGIC: Conditionally create the areas array.
+    const areas = [];
+    if (
+      bbStyles.background.visible &&
+      bbStyles.upper.visible &&
+      bbStyles.lower.visible
+    ) {
+      areas.push({
+        key: "upper_lower_area",
+        color: bbStyles.upper.color,
+        opacity: bbStyles.background.opacity,
+      });
+    }
+
     const bbIndicator: Indicator = {
       name: "BB",
       shortName: `BB(${bbInputs.length}, ${bbInputs.stdDev})`,
-      figures: [
-        { key: "upper", title: "Upper: ", type: "line" },
-        { key: "basis", title: "Basis: ", type: "line" },
-        { key: "lower", title: "Lower: ", type: "line" },
-      ],
+      figures: figures,
       calc: () => indicatorData,
       styles: {
-        // KEY FIX #2: The 'lines' property must be an OBJECT, not an array.
-        lines: {
-          upper: {
-            color: bbStyles.upper.color,
-            lineWidth: bbStyles.upper.lineWidth,
-            display: bbStyles.upper.visible,
-            lineStyle:
-              bbStyles.upper.lineStyle === "dashed"
-                ? LineType.Dashed
-                : LineType.Solid,
-          },
-          basis: {
-            color: bbStyles.basis.color,
-            lineWidth: bbStyles.basis.lineWidth,
-            display: bbStyles.basis.visible,
-            lineStyle:
-              bbStyles.basis.lineStyle === "dashed"
-                ? LineType.Dashed
-                : LineType.Solid,
-          },
-          lower: {
-            color: bbStyles.lower.color,
-            lineWidth: bbStyles.lower.lineWidth,
-            display: bbStyles.lower.visible,
-            lineStyle:
-              bbStyles.lower.lineStyle === "dashed"
-                ? LineType.Dashed
-                : LineType.Solid,
-          },
-        },
-        areas: [
-          {
-            key: "upper_lower_area",
-            color: bbStyles.upper.color,
-            opacity: bbStyles.background.opacity,
-            display: bbStyles.background.visible,
-          },
-        ],
+        lines: lines,
+        areas: areas, // Use the dynamically created areas array
       },
+      id: "",
+      paneId: "",
+      precision: 0,
+      calcParams: [],
+      shouldOhlc: false,
+      shouldFormatBigNumber: false,
+      visible: false,
+      zLevel: 0,
+      extendData: undefined,
+      series: IndicatorSeries.Normal,
+      minValue: null,
+      maxValue: null,
+      shouldUpdate: null,
+      regenerateFigures: null,
+      createTooltipDataSource: null,
+      draw: null,
+      onDataStateChange: null,
+      onClick: null,
+      result: []
     };
 
     chart.createIndicator(bbIndicator, false, { id: "bb_indicator" });
