@@ -23,17 +23,19 @@ const BollingerSettings = ({
   onClose,
 }: Props) => {
   const [activeTab, setActiveTab] = useState<"inputs" | "style">("inputs");
+
   const handleInputChange = (
     field: keyof BollingerBandsInputSettings,
     value: string
   ) => {
     onInputChange({ ...inputSettings, [field]: parseInt(value, 10) || 0 });
   };
-  
+
+  // CORRECTED: Replaced 'any' with specific types
   const handleBandStyleChange = (
     band: "basis" | "upper" | "lower",
     field: keyof BandStyle,
-    value: any
+    value: string | boolean | number
   ) => {
     onStyleChange({
       ...styleSettings,
@@ -44,8 +46,11 @@ const BollingerSettings = ({
     });
   };
 
-  // Handler for background style changes
-  const handleBackgroundChange = (field: "visible" | "opacity", value: any) => {
+  // CORRECTED: Replaced 'any' with specific types
+  const handleBackgroundChange = (
+    field: "visible" | "opacity",
+    value: boolean | number
+  ) => {
     onStyleChange({
       ...styleSettings,
       background: {
@@ -56,9 +61,7 @@ const BollingerSettings = ({
   };
 
   return (
-    // Modal backdrop
     <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-      {/* Modal content */}
       <div className="bg-gray-800 text-white p-5 rounded-lg shadow-xl w-[450px] border border-gray-700">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Bollinger Bands</h2>
@@ -67,7 +70,6 @@ const BollingerSettings = ({
           </button>
         </div>
 
-        {/* Tab Buttons */}
         <div className="flex border-b border-gray-700 mb-4">
           <button
             onClick={() => setActiveTab("inputs")}
@@ -91,9 +93,7 @@ const BollingerSettings = ({
           </button>
         </div>
 
-        {/* Tab Content */}
         <div>
-          {/* INPUTS TAB */}
           {activeTab === "inputs" && (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
@@ -129,10 +129,8 @@ const BollingerSettings = ({
             </div>
           )}
 
-          {/* STYLE TAB */}
           {activeTab === "style" && (
             <div className="space-y-3">
-              {/* Basis Line */}
               <div className="grid grid-cols-4 items-center gap-2">
                 <input
                   type="checkbox"
@@ -151,7 +149,6 @@ const BollingerSettings = ({
                   className="w-full bg-transparent"
                 />
               </div>
-              {/* Upper Line */}
               <div className="grid grid-cols-4 items-center gap-2">
                 <input
                   type="checkbox"
@@ -170,7 +167,6 @@ const BollingerSettings = ({
                   className="w-full bg-transparent"
                 />
               </div>
-              {/* Lower Line */}
               <div className="grid grid-cols-4 items-center gap-2">
                 <input
                   type="checkbox"
@@ -189,7 +185,6 @@ const BollingerSettings = ({
                   className="w-full bg-transparent"
                 />
               </div>
-              {/* Background Fill */}
               <div className="grid grid-cols-4 items-center gap-2 border-t border-gray-700 pt-3">
                 <input
                   type="checkbox"

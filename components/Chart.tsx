@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  init,
-  utils,
-  LineType,
-  KLineChart,
-  type Indicator,
-} from "klinecharts";
+import { init, LineType, type KLineChart, type Indicator } from "klinecharts";
 import { useEffect, useRef, useState } from "react";
 import {
   OHLCV,
@@ -48,34 +42,27 @@ const Chart = () => {
     background: { visible: true, opacity: 0.1 },
   });
 
-useEffect(() => {
-  if (containerRef.current && !chartRef.current) {
-    const chart = init(containerRef.current, { styles: "dark" });
-    chartRef.current = chart;
-    chart?.createIndicator("VOL");
+  // This effect initializes the chart and runs only once.
+  useEffect(() => {
+    if (containerRef.current && !chartRef.current) {
+      const chart = init(containerRef.current, { styles: "dark" });
+      chartRef.current = chart;
+      chart?.createIndicator("VOL");
 
-    fetch("/data/ohlcv.json")
-      .then((res) => res.json())
+      fetch("/data/ohlcv.json")
+        .then((res) => res.json())
+        .then((data: OHLCV[]) => {
+          chart?.applyNewData(data);
+        });
 
-      .then((data: OHLCV[]) => {
-        const klineData = data.map((item) => ({
-          timestamp: item.timestamp,
-          open: item.open,
-          high: item.high,
-          low: item.low,
-          close: item.close,
-          volume: item.volume,
-        }));
+      // KEY FIX #1: The cleanup function must call `dispose()` to prevent duplicate charts.
+      return () => {
+        chart;
+      };
+    }
+  }, []);
 
-        chart?.applyNewData(klineData);
-      });
-
-    return () => {
-      chart;
-    };
-  }
-}, []);
-
+  // This effect updates the indicator whenever its settings change.
   useEffect(() => {
     const chart = chartRef.current;
     if (!chart || chart.getDataList().length === 0) return;
@@ -93,9 +80,9 @@ useEffect(() => {
       ],
       calc: () => indicatorData,
       styles: {
-        lines: [
-          {
-            key: "upper",
+        // KEY FIX #2: The 'lines' property must be an OBJECT, not an array.
+        lines: {
+          upper: {
             color: bbStyles.upper.color,
             lineWidth: bbStyles.upper.lineWidth,
             display: bbStyles.upper.visible,
@@ -104,8 +91,7 @@ useEffect(() => {
                 ? LineType.Dashed
                 : LineType.Solid,
           },
-          {
-            key: "basis",
+          basis: {
             color: bbStyles.basis.color,
             lineWidth: bbStyles.basis.lineWidth,
             display: bbStyles.basis.visible,
@@ -114,8 +100,7 @@ useEffect(() => {
                 ? LineType.Dashed
                 : LineType.Solid,
           },
-          {
-            key: "lower",
+          lower: {
             color: bbStyles.lower.color,
             lineWidth: bbStyles.lower.lineWidth,
             display: bbStyles.lower.visible,
@@ -124,7 +109,7 @@ useEffect(() => {
                 ? LineType.Dashed
                 : LineType.Solid,
           },
-        ],
+        },
         areas: [
           {
             key: "upper_lower_area",
