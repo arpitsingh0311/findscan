@@ -1,8 +1,6 @@
 "use client";
 
-// FINAL FIX: We import `init` and derive the KLineChart type from it.
 import { init, LineType, IndicatorSeries, type Indicator } from "klinecharts";
-// This is how we get the type for the chart instance
 type KLineChart = ReturnType<typeof init>;
 
 import { useEffect, useRef, useState } from "react";
@@ -46,18 +44,15 @@ const Chart = () => {
     background: { visible: true, opacity: 0.1 },
   });
 
-  // This effect initializes the chart and runs only once.
   useEffect(() => {
     if (containerRef.current && !chartRef.current) {
       const chart = init(containerRef.current, { styles: "dark" });
       chartRef.current = chart;
-      // Use optional chaining here
       chart?.createIndicator("VOL");
 
       fetch("/data/ohlcv.json")
         .then((res) => res.json())
         .then((data: OHLCV[]) => {
-          // Map OHLCV[] to KLineData[]
           const klineData = data.map((item) => ({
             timestamp: item.timestamp,
             open: item.open,
@@ -69,14 +64,12 @@ const Chart = () => {
           chart?.applyNewData(klineData);
         });
 
-      // The cleanup function must call `dispose()` to prevent duplicate charts.
       return () => {
         chart;
       };
     }
   }, []);
 
-  // This effect updates the indicator whenever its settings change.
   useEffect(() => {
     const chart = chartRef.current;
     if (!chart || chart.getDataList().length === 0) return;
@@ -122,7 +115,7 @@ const Chart = () => {
       });
     }
 
-    // CORRECTED LOGIC: Conditionally create the areas array.
+    // Conditionally create the areas array.
     const areas = [];
     if (
       bbStyles.background.visible &&
@@ -143,7 +136,7 @@ const Chart = () => {
       calc: () => indicatorData,
       styles: {
         lines: lines,
-        areas: areas, // Use the dynamically created areas array
+        areas: areas, 
       },
       id: "",
       paneId: "",
